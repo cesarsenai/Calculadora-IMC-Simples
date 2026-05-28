@@ -231,6 +231,74 @@
         color: #ffffff;
         font-weight: 600;
       }
+
+      .ideal-weight {
+        margin-top: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .ideal-weight.visible {
+        display: block;
+      }
+
+      .ideal-weight-title {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 10px;
+      }
+
+      .ideal-weight-range {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .ideal-weight-box {
+        flex: 1;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+      }
+
+      .ideal-weight-box .val {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #4ade80;
+        line-height: 1;
+      }
+
+      .ideal-weight-box .lbl {
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 4px;
+      }
+
+      .ideal-weight-sep {
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 1.2rem;
+      }
+
+      .ideal-weight-diff {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.65);
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      .ideal-weight-diff strong {
+        color: #ffffff;
+      }
     </style>
   </head>
   <body>
@@ -265,6 +333,22 @@
         <div class="imc-label">Seu IMC</div>
         <div class="classification" id="imc-class">—</div>
         <div class="description" id="imc-desc">—</div>
+
+        <div class="ideal-weight" id="peso-ideal">
+          <div class="ideal-weight-title">Peso ideal para sua altura</div>
+          <div class="ideal-weight-range">
+            <div class="ideal-weight-box">
+              <div class="val" id="peso-min">—</div>
+              <div class="lbl">Mínimo (kg)</div>
+            </div>
+            <div class="ideal-weight-sep">–</div>
+            <div class="ideal-weight-box">
+              <div class="val" id="peso-max">—</div>
+              <div class="lbl">Máximo (kg)</div>
+            </div>
+          </div>
+          <div class="ideal-weight-diff" id="peso-diff">—</div>
+        </div>
       </div>
 
       <div class="scale" id="tabela">
@@ -360,6 +444,33 @@
         document.getElementById('imc-valor').textContent = imc.toFixed(1).replace('.', ',');
         document.getElementById('imc-class').textContent = classe;
         document.getElementById('imc-desc').textContent  = descricao;
+
+        const pesoIdealEl = document.getElementById('peso-ideal');
+        if (categoria !== 'normal') {
+          const altM = alturaMetros;
+          const pesoMin = (18.5 * altM * altM).toFixed(1).replace('.', ',');
+          const pesoMax = (24.9 * altM * altM).toFixed(1).replace('.', ',');
+
+          const pesoMinNum = 18.5 * altM * altM;
+          const pesoMaxNum = 24.9 * altM * altM;
+
+          document.getElementById('peso-min').textContent = pesoMin;
+          document.getElementById('peso-max').textContent = pesoMax;
+
+          let diffTexto;
+          if (peso < pesoMinNum) {
+            const diff = (pesoMinNum - peso).toFixed(1).replace('.', ',');
+            diffTexto = `Você precisa ganhar pelo menos <strong>${diff} kg</strong> para atingir o peso ideal.`;
+          } else {
+            const diff = (peso - pesoMaxNum).toFixed(1).replace('.', ',');
+            diffTexto = `Você precisa perder pelo menos <strong>${diff} kg</strong> para atingir o peso ideal.`;
+          }
+
+          document.getElementById('peso-diff').innerHTML = diffTexto;
+          pesoIdealEl.classList.add('visible');
+        } else {
+          pesoIdealEl.classList.remove('visible');
+        }
 
         const tabela = document.getElementById('tabela');
         tabela.classList.add('visible');
